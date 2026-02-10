@@ -1,41 +1,74 @@
-tasks = []
-print("Welcome to the To-Do List App!")
-while True:
-    print("\nPlease choose an option:")
-    print("1. Add a task")
-    print("2. View tasks")
-    print("3. Remove a task")
-    print("4. Exit")
+import os
 
-    choice = input("Enter your choice (1-4): ")
+FILENAME = "tasks.txt"
 
-    if choice == '1':
-        task = input("Enter the task you want to add: ")
-        tasks.append(task)
-        print(f"Task '{task}' added to the list.")
-    elif choice == '2':
-        if not tasks:
-            print("Your to-do list is empty.")
-        else:
-            print("Your to-do list:")
-            for idx, task in enumerate(tasks, start=1):
-                print(f"{idx}. {task}")
-    elif choice == '3':
-        if not tasks:
-            print("Your to-do list is empty.")
-        else:
-            try:
-                task_num = int(input("Enter the number of the task you want to remove: "))
-                if 1 <= task_num <= len(tasks):
-                    removed_task = tasks.pop(task_num - 1)
-                    print(f"Task '{removed_task}' removed from the list.")
-                else:
-                    print("Invalid task number.")
-            except ValueError:
-                print("Please enter a valid number.")
-    elif choice == '4':
-        print("Exiting the To-Do List App. Goodbye!")
-        break
+def load_tasks():
+    """Загружает задачи из файла."""
+    if not os.path.exists(FILENAME):
+        return []
+    with open(FILENAME, "r", encoding="utf-8") as file:
+        return [line.strip() for line in file.readlines()]
+
+def save_tasks(tasks):
+    """Сохраняет задачи в файл."""
+    with open(FILENAME, "w", encoding="utf-8") as file:
+        for task in tasks:
+            file.write(f"{task}\n")
+
+def show_tasks(tasks):
+    """Выводит список задач."""
+    if not tasks:
+        print("\n[!] Список задач пуст.")
     else:
-        print("Invalid choice. Please enter a number between 1 and 4.")
+        print("\n--- Ваши задачи ---")
+        for idx, task in enumerate(tasks, 1):
+            print(f"{idx}. {task}")
+
+def add_task(tasks):
+    """Добавляет новую задачу."""
+    task = input("Введите описание задачи: ").strip()
+    if task:
+        tasks.append(task)
+        save_tasks(tasks)
+        print(f" Задача '{task}' добавлена!")
+
+def remove_task(tasks):
+    """Удаляет задачу по номеру."""
+    show_tasks(tasks)
+    if not tasks:
+        return
+    try:
+        num = int(input("Введите номер задачи для удаления: "))
+        if 1 <= num <= len(tasks):
+            removed = tasks.pop(num - 1)
+            save_tasks(tasks)
+            print(f" Задача '{removed}' удалена.")
+        else:
+            print(" Неверный номер.")
+    except ValueError:
+        print(" Пожалуйста, введите число.")
+
+def main():
+    """Основной цикл программы."""
+    tasks = load_tasks()
+    print("Welcome to the Professional To-Do App!")
+    
+    while True:
+        print("\n1. Добавить | 2. Показать | 3. Удалить | 4. Выход")
+        choice = input("Выберите действие: ")
+
+        if choice == '1':
+            add_task(tasks)
+        elif choice == '2':
+            show_tasks(tasks)
+        elif choice == '3':
+            remove_task(tasks)
+        elif choice == '4':
+            print(" До свидания!")
+            break
+        else:
+            print(" Неизвестная команда.")
+
+if __name__ == "__main__":
+    main()
         
